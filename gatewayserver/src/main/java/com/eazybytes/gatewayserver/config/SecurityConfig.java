@@ -24,19 +24,21 @@ public class SecurityConfig {
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity) {
         // for all APIs supporting HTTP GET method, permit all
         serverHttpSecurity.authorizeExchange(exchanges -> exchanges.pathMatchers(HttpMethod.GET).permitAll()
-                // Account, card, and loan APIs require an authenticated user
-                .pathMatchers("/eazybank/accounts/**").authenticated()
-                .pathMatchers("/eazybank/cards/**").authenticated()
-                .pathMatchers("/eazybank/loans/**").authenticated())
+                // Account, card, and loan APIs require a user to have corresponding role
+                .pathMatchers("/eazybank/accounts/**").hasRole("ACCOUNTS")
+                .pathMatchers("/eazybank/cards/**").hasRole("CARDS")
+                .pathMatchers("/eazybank/loans/**").hasRole("LOANS"))
                 // with this we are converting our gateway server as an OAuth2 resource server
                 .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
-                        .jwt(Customizer.withDefaults()));
+                        // extract roles from the JWT's "realm_access" claim (Keycloak) and
+                        // map them to Spring Security GrantedAuthorities using a custom converter
+                        .jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(grantedAuthoritiesExtractor())));
         // Disable csrf protection provided by Spring Security framework
         // csrf protection is only needed when browsers are involved
         serverHttpSecurity.csrf(ServerHttpSecurity.CsrfSpec::disable);
         return serverHttpSecurity.build();
     }
-    /*
+
     private Converter<Jwt, Mono<AbstractAuthenticationToken>> grantedAuthoritiesExtractor() {
         JwtAuthenticationConverter jwtAuthenticationConverter =
                 new JwtAuthenticationConverter();
@@ -44,5 +46,5 @@ public class SecurityConfig {
                 (new KeycloakRoleConverter());
         return new ReactiveJwtAuthenticationConverterAdapter(jwtAuthenticationConverter);
     }
-    */
+
 }
