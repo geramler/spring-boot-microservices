@@ -15,21 +15,28 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Mono;
 
 @Configuration
+// since Spring Cloud Gateway is built based upon the Spring Reactive module,
+// we need to make sure we are using this annotation
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity) {
+        // for all APIs supporting HTTP GET method, permit all
         serverHttpSecurity.authorizeExchange(exchanges -> exchanges.pathMatchers(HttpMethod.GET).permitAll()
-                .pathMatchers("/eazybank/accounts/**").hasRole("ACCOUNTS")
-                .pathMatchers("/eazybank/cards/**").hasRole("CARDS")
-                .pathMatchers("/eazybank/loans/**").hasRole("LOANS"))
+                // Account, card, and loan APIs require an authenticated user
+                .pathMatchers("/eazybank/accounts/**").authenticated()
+                .pathMatchers("/eazybank/cards/**").authenticated()
+                .pathMatchers("/eazybank/loans/**").authenticated())
+                // with this we are converting our gateway server as an OAuth2 resource server
                 .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
-                        .jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(grantedAuthoritiesExtractor())));
-        serverHttpSecurity.csrf(csrfSpec -> csrfSpec.disable());
+                        .jwt(Customizer.withDefaults()));
+        // Disable csrf protection provided by Spring Security framework
+        // csrf protection is only needed when browsers are involved
+        serverHttpSecurity.csrf(ServerHttpSecurity.CsrfSpec::disable);
         return serverHttpSecurity.build();
     }
-
+    /*
     private Converter<Jwt, Mono<AbstractAuthenticationToken>> grantedAuthoritiesExtractor() {
         JwtAuthenticationConverter jwtAuthenticationConverter =
                 new JwtAuthenticationConverter();
@@ -37,5 +44,5 @@ public class SecurityConfig {
                 (new KeycloakRoleConverter());
         return new ReactiveJwtAuthenticationConverterAdapter(jwtAuthenticationConverter);
     }
-
+    */
 }

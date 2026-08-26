@@ -48,7 +48,7 @@ public class AccountsController {
         this.iAccountsService = iAccountsService;
     }
 
-        @Value("${build.version:unknown}")
+    @Value("${build.version}")
     private String buildVersion;
 
     @Autowired

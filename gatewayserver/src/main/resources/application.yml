@@ -24,6 +24,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
+          # using this public certificate, resource server can validate
+          # if the keycloak server really issued a given access token
           jwk-set-uri: "http://localhost:7080/realms/master/protocol/openid-connect/certs"
 management:
   endpoints:

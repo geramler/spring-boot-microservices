@@ -1,0 +1,6 @@
+1. Config Server
+2. Eureka Server
+3. Accounts Ms
+4. Loans Ms
+5. Cards Ms
+6. Gateway Server
