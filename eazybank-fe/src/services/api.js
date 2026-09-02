@@ -16,21 +16,21 @@ const LOANS_BASE = `${GATEWAY_BASE}/eazybank/loans/api`;
  * @returns {Promise<Response>}
  */
 async function apiCall(url, options = {}, user) {
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(options.headers || {}),
-  };
+    const headers = {
+        'Content-Type': 'application/json',
+        ...(options.headers || {}),
+    };
 
-  if (user?.access_token) {
-    headers['Authorization'] = `Bearer ${user.access_token}`;
-  }
+    if (user?.access_token) {
+        headers['Authorization'] = `Bearer ${user.access_token}`;
+    }
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
+    const response = await fetch(url, {
+        ...options,
+        headers,
+    });
 
-  return response;
+    return response;
 }
 
 // ─── Accounts ──────────────────────────────────────────────
@@ -39,23 +39,23 @@ async function apiCall(url, options = {}, user) {
  * Create a new customer account.
  * POST /eazybank/accounts/api/create
  */
-export async function createAccount(user, { name, email, mobileNumber, accountType, branchAddress }) {
-  const body = {
-    name,
-    email,
-    mobileNumber,
-    accountsDto: {
-      accountType,
-      branchAddress,
-    },
-  };
+export async function createAccount(user, {name, email, mobileNumber, accountType, branchAddress}) {
+    const body = {
+        name,
+        email,
+        mobileNumber,
+        accountsDto: {
+            accountType,
+            branchAddress,
+        },
+    };
 
-  const res = await apiCall(`${ACCOUNTS_BASE}/create`, {
-    method: 'POST',
-    body: JSON.stringify(body),
-  }, user);
+    const res = await apiCall(`${ACCOUNTS_BASE}/create`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+    }, user);
 
-  return handleResponse(res);
+    return handleResponse(res);
 }
 
 /**
@@ -63,13 +63,13 @@ export async function createAccount(user, { name, email, mobileNumber, accountTy
  * GET /eazybank/accounts/api/fetch?mobileNumber=...
  */
 export async function fetchAccount(user, mobileNumber) {
-  const res = await apiCall(
-    `${ACCOUNTS_BASE}/fetch?mobileNumber=${encodeURIComponent(mobileNumber)}`,
-    { method: 'GET' },
-    user,
-  );
+    const res = await apiCall(
+        `${ACCOUNTS_BASE}/fetch?mobileNumber=${encodeURIComponent(mobileNumber)}`,
+        {method: 'GET'},
+        user,
+    );
 
-  return handleResponse(res);
+    return handleResponse(res);
 }
 
 /**
@@ -77,12 +77,12 @@ export async function fetchAccount(user, mobileNumber) {
  * PUT /eazybank/accounts/api/update
  */
 export async function updateAccount(user, accountData) {
-  const res = await apiCall(`${ACCOUNTS_BASE}/update`, {
-    method: 'PUT',
-    body: JSON.stringify(accountData),
-  }, user);
+    const res = await apiCall(`${ACCOUNTS_BASE}/update`, {
+        method: 'PUT',
+        body: JSON.stringify(accountData),
+    }, user);
 
-  return handleResponse(res);
+    return handleResponse(res);
 }
 
 /**
@@ -90,13 +90,33 @@ export async function updateAccount(user, accountData) {
  * DELETE /eazybank/accounts/api/delete?mobileNumber=...
  */
 export async function deleteAccount(user, mobileNumber) {
-  const res = await apiCall(
-    `${ACCOUNTS_BASE}/delete?mobileNumber=${encodeURIComponent(mobileNumber)}`,
-    { method: 'DELETE' },
-    user,
-  );
+    const res = await apiCall(
+        `${ACCOUNTS_BASE}/delete?mobileNumber=${encodeURIComponent(mobileNumber)}`,
+        {method: 'DELETE'},
+        user,
+    );
 
-  return handleResponse(res);
+    return handleResponse(res);
+}
+
+/**
+ * Fetch full customer details (account, cards, loans).
+ * GET /eazybank/accounts/api/fetchCustomerDetails?mobileNumber=...
+ */
+export async function fetchCustomerDetails(user, mobileNumber) {
+    // Generate a simple correlation ID for distributed tracing
+    const correlationId = `eazybank-fe-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+    const res = await apiCall(
+        `${ACCOUNTS_BASE}/fetchCustomerDetails?mobileNumber=${encodeURIComponent(mobileNumber)}`,
+        {
+            method: 'GET',
+            headers: {'eazybank-correlation-id': correlationId},
+        },
+        user,
+    );
+
+    return handleResponse(res);
 }
 
 // ─── Cards ──────────────────────────────────────────────
@@ -106,13 +126,13 @@ export async function deleteAccount(user, mobileNumber) {
  * POST /eazybank/cards/api/create?mobileNumber=...
  */
 export async function createCard(user, mobileNumber) {
-  const res = await apiCall(
-    `${CARDS_BASE}/create?mobileNumber=${encodeURIComponent(mobileNumber)}`,
-    { method: 'POST' },
-    user,
-  );
+    const res = await apiCall(
+        `${CARDS_BASE}/create?mobileNumber=${encodeURIComponent(mobileNumber)}`,
+        {method: 'POST'},
+        user,
+    );
 
-  return handleResponse(res);
+    return handleResponse(res);
 }
 
 /**
@@ -120,13 +140,13 @@ export async function createCard(user, mobileNumber) {
  * GET /eazybank/cards/api/fetch?mobileNumber=...
  */
 export async function fetchCard(user, mobileNumber) {
-  const res = await apiCall(
-    `${CARDS_BASE}/fetch?mobileNumber=${encodeURIComponent(mobileNumber)}`,
-    { method: 'GET' },
-    user,
-  );
+    const res = await apiCall(
+        `${CARDS_BASE}/fetch?mobileNumber=${encodeURIComponent(mobileNumber)}`,
+        {method: 'GET'},
+        user,
+    );
 
-  return handleResponse(res);
+    return handleResponse(res);
 }
 
 /**
@@ -134,12 +154,12 @@ export async function fetchCard(user, mobileNumber) {
  * PUT /eazybank/cards/api/update
  */
 export async function updateCard(user, cardData) {
-  const res = await apiCall(`${CARDS_BASE}/update`, {
-    method: 'PUT',
-    body: JSON.stringify(cardData),
-  }, user);
+    const res = await apiCall(`${CARDS_BASE}/update`, {
+        method: 'PUT',
+        body: JSON.stringify(cardData),
+    }, user);
 
-  return handleResponse(res);
+    return handleResponse(res);
 }
 
 /**
@@ -147,13 +167,13 @@ export async function updateCard(user, cardData) {
  * DELETE /eazybank/cards/api/delete?mobileNumber=...
  */
 export async function deleteCard(user, mobileNumber) {
-  const res = await apiCall(
-    `${CARDS_BASE}/delete?mobileNumber=${encodeURIComponent(mobileNumber)}`,
-    { method: 'DELETE' },
-    user,
-  );
+    const res = await apiCall(
+        `${CARDS_BASE}/delete?mobileNumber=${encodeURIComponent(mobileNumber)}`,
+        {method: 'DELETE'},
+        user,
+    );
 
-  return handleResponse(res);
+    return handleResponse(res);
 }
 
 // ─── Loans ──────────────────────────────────────────────
@@ -163,13 +183,13 @@ export async function deleteCard(user, mobileNumber) {
  * POST /eazybank/loans/api/create?mobileNumber=...
  */
 export async function createLoan(user, mobileNumber) {
-  const res = await apiCall(
-    `${LOANS_BASE}/create?mobileNumber=${encodeURIComponent(mobileNumber)}`,
-    { method: 'POST' },
-    user,
-  );
+    const res = await apiCall(
+        `${LOANS_BASE}/create?mobileNumber=${encodeURIComponent(mobileNumber)}`,
+        {method: 'POST'},
+        user,
+    );
 
-  return handleResponse(res);
+    return handleResponse(res);
 }
 
 /**
@@ -177,13 +197,13 @@ export async function createLoan(user, mobileNumber) {
  * GET /eazybank/loans/api/fetch?mobileNumber=...
  */
 export async function fetchLoan(user, mobileNumber) {
-  const res = await apiCall(
-    `${LOANS_BASE}/fetch?mobileNumber=${encodeURIComponent(mobileNumber)}`,
-    { method: 'GET' },
-    user,
-  );
+    const res = await apiCall(
+        `${LOANS_BASE}/fetch?mobileNumber=${encodeURIComponent(mobileNumber)}`,
+        {method: 'GET'},
+        user,
+    );
 
-  return handleResponse(res);
+    return handleResponse(res);
 }
 
 /**
@@ -191,12 +211,12 @@ export async function fetchLoan(user, mobileNumber) {
  * PUT /eazybank/loans/api/update
  */
 export async function updateLoan(user, loanData) {
-  const res = await apiCall(`${LOANS_BASE}/update`, {
-    method: 'PUT',
-    body: JSON.stringify(loanData),
-  }, user);
+    const res = await apiCall(`${LOANS_BASE}/update`, {
+        method: 'PUT',
+        body: JSON.stringify(loanData),
+    }, user);
 
-  return handleResponse(res);
+    return handleResponse(res);
 }
 
 /**
@@ -204,13 +224,13 @@ export async function updateLoan(user, loanData) {
  * DELETE /eazybank/loans/api/delete?mobileNumber=...
  */
 export async function deleteLoan(user, mobileNumber) {
-  const res = await apiCall(
-    `${LOANS_BASE}/delete?mobileNumber=${encodeURIComponent(mobileNumber)}`,
-    { method: 'DELETE' },
-    user,
-  );
+    const res = await apiCall(
+        `${LOANS_BASE}/delete?mobileNumber=${encodeURIComponent(mobileNumber)}`,
+        {method: 'DELETE'},
+        user,
+    );
 
-  return handleResponse(res);
+    return handleResponse(res);
 }
 
 // ─── Helpers ────────────────────────────────────────────────
@@ -219,23 +239,23 @@ export async function deleteLoan(user, mobileNumber) {
  * Parse the response and throw on non-2xx statuses.
  */
 async function handleResponse(res) {
-  if (res.status === 204) {
-    return { statusCode: '204', statusMsg: 'No Content' };
-  }
-
-  const contentType = res.headers.get('content-type') || '';
-
-  if (contentType.includes('application/json')) {
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.errorMessage || data.statusMsg || `Request failed with status ${res.status}`);
+    if (res.status === 204) {
+        return {statusCode: '204', statusMsg: 'No Content'};
     }
-    return data;
-  }
 
-  if (!res.ok) {
-    throw new Error(`Request failed with status ${res.status}`);
-  }
+    const contentType = res.headers.get('content-type') || '';
 
-  return { statusCode: res.status.toString(), statusMsg: res.statusText };
+    if (contentType.includes('application/json')) {
+        const data = await res.json();
+        if (!res.ok) {
+            throw new Error(data.errorMessage || data.statusMsg || `Request failed with status ${res.status}`);
+        }
+        return data;
+    }
+
+    if (!res.ok) {
+        throw new Error(`Request failed with status ${res.status}`);
+    }
+
+    return {statusCode: res.status.toString(), statusMsg: res.statusText};
 }
