@@ -1,4 +1,5 @@
 import { useAuth } from 'react-oidc-context';
+import { getUserRoles } from '../auth/roles';
 
 /**
  * Wraps children so they are only rendered when the user is authenticated
@@ -7,7 +8,7 @@ import { useAuth } from 'react-oidc-context';
  * The gateway maps Keycloak realm roles ("ACCOUNTS", "CARDS", "LOANS")
  * to Spring Security roles ("ROLE_ACCOUNTS", etc.) via KeycloakRoleConverter.
  *
- * In the JWT, roles live under: realm_access.roles[ ]
+ * Roles are extracted from the access token's `realm_access.roles` claim.
  *
  * @param {{ role: string, children: React.ReactNode }} props
  */
@@ -38,8 +39,8 @@ export default function ProtectedRoute({ role, children }) {
     );
   }
 
-  // ── Check role (from realm_access.roles in JWT) ─────
-  const roles = auth.user?.profile?.realm_access?.roles || [];
+  // ── Check role (from access token's realm_access.roles) ───
+  const roles = getUserRoles(auth.user);
 
   if (!roles.includes(role)) {
     return (

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
+import { getUserRoles } from '../auth/roles';
 
 export default function Home() {
   const auth = useAuth();
@@ -13,7 +14,7 @@ export default function Home() {
   }
 
   const isAuthenticated = auth.isAuthenticated;
-  const roles = auth.user?.profile?.realm_access?.roles || [];
+  const roles = getUserRoles(auth.user);
   const userName = auth.user?.profile?.name || auth.user?.profile?.preferred_username || 'Customer';
 
   return (

@@ -13,8 +13,13 @@ export const oidcConfig = {
   // Where to redirect after logout
   post_logout_redirect_uri: 'http://localhost:5173/',
 
-  // OpenID Connect scopes
-  scope: 'openid profile email',
+  // OpenID Connect scopes — 'roles' is required so Keycloak includes
+  // realm_access.roles in the ID token and userinfo response
+  scope: 'openid profile email roles',
+
+  // Load user info from the userinfo endpoint (default: true).
+  // MUST be true so that roles from realm_access are available in user.profile
+  loadUserInfo: true,
 
   // Use silent renew when token is about to expire
   automaticSilentRenew: true,
