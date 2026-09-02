@@ -46,7 +46,7 @@ public class AccountsServiceImpl  implements IAccountsService {
         }
         Customer savedCustomer = customerRepository.save(customer);
         Accounts savedAccount = accountsRepository.save(createNewAccount(savedCustomer));
-        sendCommunication(savedAccount, savedCustomer);
+        // sendCommunication(savedAccount, savedCustomer);
     }
 
     private void sendCommunication(Accounts account, Customer customer) {
