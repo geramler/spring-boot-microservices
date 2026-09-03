@@ -13,8 +13,9 @@ spring:
         emailsms-in-0:
           # RabbitMQ exchange to consume from (queue is derived from destination.group)
           # `destination` = exchange, `destination.group` = queue
-          destination: send-communication
-          group: ${spring.application.name}
+          # destination = send-communication.message
+         destination: send-communication
+         group: ${spring.application.name}
         emailsms-out-0:
           destination: communication-sent
   rabbitmq:

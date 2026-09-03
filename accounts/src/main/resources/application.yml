@@ -28,6 +28,9 @@ spring:
       definition: updateCommunication
     stream:
       bindings:
+        # RabbitMQ exchange to consume from (queue is derived from destination.group)
+        # `destination` = exchange, `destination.group` = queue
+        # destination = communication-sent.accounts
         updateCommunication-in-0:
           destination: communication-sent
           group: ${spring.application.name}

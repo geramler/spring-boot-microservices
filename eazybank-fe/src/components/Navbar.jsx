@@ -47,9 +47,7 @@ export default function Navbar() {
             </span>
                         <button onClick={handleLogout}>Logout</button>
                     </>
-                ) : (
-                    <button onClick={handleLogin}>Login with Keycloak</button>
-                )}
+                ) : null}
             </div>
         </nav>
     );
